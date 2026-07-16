@@ -51,9 +51,38 @@ void drawGameboard(sf::RenderWindow& newWindow){
         }
     }
 
+sf::Vector2i generateApple(const std::vector<sf::Vector2i>& bodyvector){
+
+    int appleX; int appleY; bool match;
+
+
+    while (true){
+        
+        match = false;
+        appleX = rand() % 17;
+        appleY = rand() % 15;
+
+        for (int i = 0; i < bodyvector.size(); i++){
+
+            if (appleX == bodyvector[i].x && appleY == bodyvector[i].y){
+                
+                match = true;
+                break;
+            }
+        }
+
+        if (!match){
+            break;
+        }
+    }
+
+    return {appleX, appleY};
+}
+
 int main() {
 
     sf::RenderWindow window(sf::VideoMode({BOARDWIDTH, BOARDHEIGHT}), "Snake Game"); // creating the window
+    window.setFramerateLimit(60);
 
     sf::RectangleShape bodyPart(sf::Vector2f(GRIDSIZE, GRIDSIZE)); // creating a part of the body
     
@@ -65,7 +94,7 @@ int main() {
     // internal timer
     sf::Clock clock;
     float timer = 0;
-    float delay = 0.2f;
+    float delay = 0.1f;
 
     sf::Vector2i direction = {1,0}; // default movement to the right
     sf::Vector2i nextDirection = {1,0};
@@ -77,8 +106,7 @@ int main() {
 
     srand(time(0));
 
-    int alma_x = (rand() % 18);
-    int alma_y = (rand() % 16);
+    sf::Vector2i appleXY = generateApple(snakeBody);
 
     while (window.isOpen()) {
 
@@ -108,6 +136,7 @@ int main() {
             }
         }
 
+
         // update: moving the snake
         if (timer > delay) {
             timer = 0;
@@ -134,10 +163,10 @@ int main() {
 
 
 
-            if (snakeBody[0].x == alma_x && snakeBody[0].y == alma_y) { // is the snake eating an apple?
+            if (snakeBody[0].x == appleXY.x && snakeBody[0].y == appleXY.y) { // is the snake eating an apple?
 
-                alma_x = rand() % 17;
-                alma_y = rand() % 15;
+                appleXY = generateApple(snakeBody);
+
             } else {
                 snakeBody.pop_back(); // if not we remove the last body part
             }
@@ -173,10 +202,11 @@ int main() {
             window.draw(bodyPart);
 
         }
+
         apple.setPosition({
 
-            static_cast<float>(alma_x * GRIDSIZE),
-            static_cast<float>(alma_y * GRIDSIZE)
+            static_cast<float>(appleXY.x * GRIDSIZE),
+            static_cast<float>(appleXY.y * GRIDSIZE)
         });
 
         window.draw(apple);
