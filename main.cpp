@@ -5,10 +5,11 @@
 #include <ctime>
 
 const int GRIDSIZE = 50;
+const int HUD = 2;
 const int WIDTH = 17;
 const int HEIGHT = 15;
 const int BOARDWIDTH = GRIDSIZE * WIDTH;
-const int BOARDHEIGHT = GRIDSIZE * HEIGHT;
+const int BOARDHEIGHT = GRIDSIZE * HEIGHT + HUD * GRIDSIZE;
 
 // compile:g++ main.cpp -IC:\SFML\SFML-3.1.0-windows-gcc-14.2.0-mingw-64-bit\SFML-3.1.0\include -LC:\SFML\SFML-3.1.0-windows-gcc-14.2.0-mingw-64-bit\SFML-3.1.0\lib -lsfml-graphics -lsfml-window -lsfml-system -o snake.exe
 
@@ -18,7 +19,7 @@ void drawGameboard(sf::RenderWindow& newWindow){
 
         int even = 0;
 
-        for (int i = 0; i <= BOARDHEIGHT; i += GRIDSIZE) {
+        for (int i = HUD * GRIDSIZE; i <= BOARDHEIGHT; i += GRIDSIZE) {
             
             for (int j = 0; j <= BOARDWIDTH; j += GRIDSIZE) {
 
@@ -30,14 +31,10 @@ void drawGameboard(sf::RenderWindow& newWindow){
                 if ( even % 2 == 0) {
 
                     tile.setFillColor({25,105,5});
-                    /*tile.setOutlineColor(sf::Color::Black);
-                    tile.setOutlineThickness(1);*/
 
                 } else {
                     
                     tile.setFillColor({39,245,87});
-                    /*tile.setOutlineColor(sf::Color::Black);
-                    tile.setOutlineThickness(1);*/
                 }
 
                 newWindow.draw(tile);
@@ -59,8 +56,8 @@ sf::Vector2i generateApple(const std::vector<sf::Vector2i>& bodyvector){
     while (true){
         
         match = false;
-        appleX = rand() % 17;
-        appleY = rand() % 15;
+        appleX = rand() % 17 +;
+        appleY = rand() % 15 +;
 
         for (int i = 0; i < bodyvector.size(); i++){
 
@@ -108,6 +105,8 @@ int main() {
 
     sf::Vector2i appleXY = generateApple(snakeBody);
 
+    int score = 0;
+
     while (window.isOpen()) {
 
         float dt = clock.restart().asSeconds();
@@ -145,7 +144,7 @@ int main() {
 
             sf::Vector2i newHead = snakeBody[0] + direction;
 
-            if (newHead.x > WIDTH || newHead.x < -1 || newHead.y > HEIGHT || newHead.y < -1)
+            if (newHead.x > WIDTH - 1 || newHead.x < 0 || newHead.y > HEIGHT + HUD - 1|| newHead.y < 0 + HUD)
             {
                 window.close();
             }
@@ -172,7 +171,6 @@ int main() {
             }
           
         }
-
 
         // drawing the snake from the vector
         window.clear(sf::Color::White);
