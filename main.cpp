@@ -121,7 +121,17 @@ int main() {
                 window.close();
             }
             
+            for (int i = 1; i < snakeBody.size(); i++){
+
+                if (newHead.x == snakeBody[i].x && newHead.y == snakeBody[i].y)
+                {
+                    window.close();
+                }
+            }
+
             snakeBody.insert(snakeBody.begin(), newHead); // we give the snake a new head
+
+
 
 
             if (snakeBody[0].x == alma_x && snakeBody[0].y == alma_y) { // is the snake eating an apple?
