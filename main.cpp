@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <string>
 
 const int GRIDSIZE = 50;
 const int HUD = 2;
@@ -10,6 +11,8 @@ const int WIDTH = 17;
 const int HEIGHT = 15;
 const int BOARDWIDTH = GRIDSIZE * WIDTH;
 const int BOARDHEIGHT = GRIDSIZE * HEIGHT + HUD * GRIDSIZE;
+
+int score = 0;
 
 // compile:g++ main.cpp -IC:\SFML\SFML-3.1.0-windows-gcc-14.2.0-mingw-64-bit\SFML-3.1.0\include -LC:\SFML\SFML-3.1.0-windows-gcc-14.2.0-mingw-64-bit\SFML-3.1.0\lib -lsfml-graphics -lsfml-window -lsfml-system -o snake.exe
 
@@ -24,8 +27,8 @@ void drawGameboard(sf::RenderWindow& newWindow){
             for (int j = 0; j <= BOARDWIDTH; j += GRIDSIZE) {
 
                 tile.setPosition({
-                static_cast<float>(j),
-                static_cast<float>(i)
+                    static_cast<float>(j),
+                    static_cast<float>(i)
                 });
 
                 if ( even % 2 == 0) {
@@ -56,8 +59,8 @@ sf::Vector2i generateApple(const std::vector<sf::Vector2i>& bodyvector){
     while (true){
         
         match = false;
-        appleX = rand() % 17 +;
-        appleY = rand() % 15 +;
+        appleX = rand() % 17;
+        appleY = rand() % 15 + HUD;
 
         for (int i = 0; i < bodyvector.size(); i++){
 
@@ -79,14 +82,31 @@ sf::Vector2i generateApple(const std::vector<sf::Vector2i>& bodyvector){
 int main() {
 
     sf::RenderWindow window(sf::VideoMode({BOARDWIDTH, BOARDHEIGHT}), "Snake Game"); // creating the window
-    window.setFramerateLimit(60);
+        window.setFramerateLimit(60);
+
+    sf::RectangleShape scoreboard(sf::Vector2f(BOARDHEIGHT, HUD*GRIDSIZE)); // creating box for scoreboard
+        scoreboard.setFillColor(sf::Color::White);
+        scoreboard.setOutlineColor(sf::Color::Yellow);
+        scoreboard.setOutlineThickness(5);
 
     sf::RectangleShape bodyPart(sf::Vector2f(GRIDSIZE, GRIDSIZE)); // creating a part of the body
     
     std::vector<sf::Vector2i> snakeBody = {{5,5},{5,6},{5,7}}; // temporary vector
 
     sf::RectangleShape apple(sf::Vector2f(GRIDSIZE,GRIDSIZE)); // apple
-    apple.setFillColor(sf::Color::Red);
+        apple.setFillColor(sf::Color::Red);
+
+    sf::Font font;
+    if (!font.openFromFile("ARIAL.ttf"))
+    {
+        return 1;
+    }
+
+    sf::Text text(font);
+        text.setFillColor(sf::Color::Black);
+        text.setString("Score: " + std::to_string(score));
+        text.setCharacterSize(20);
+    
 
     // internal timer
     sf::Clock clock;
@@ -104,8 +124,8 @@ int main() {
     srand(time(0));
 
     sf::Vector2i appleXY = generateApple(snakeBody);
+    // std::cout << appleXY.x << " "<< appleXY.y << "\n" ;
 
-    int score = 0;
 
     while (window.isOpen()) {
 
@@ -165,6 +185,8 @@ int main() {
             if (snakeBody[0].x == appleXY.x && snakeBody[0].y == appleXY.y) { // is the snake eating an apple?
 
                 appleXY = generateApple(snakeBody);
+                score++;
+                text.setString("Score: " + std::to_string(score));
 
             } else {
                 snakeBody.pop_back(); // if not we remove the last body part
@@ -208,6 +230,8 @@ int main() {
         });
 
         window.draw(apple);
+        window.draw(scoreboard);
+        window.draw(text);
 
         window.display();
     }
